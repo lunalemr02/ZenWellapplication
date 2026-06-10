@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZenWell — Aperçu Application</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F0EDF8; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem 3rem; gap: 1.5rem; }
+  h1 { font-size: 22px; font-weight: 500; color: #2D1B4E; letter-spacing: -.02em; }
+  .subtitle { font-size: 13px; color: #888780; margin-top: 4px; }
+  .nav-pills { display: flex; gap: 6px; background: #fff; border-radius: 40px; padding: 4px; border: 0.5px solid #EEEDFE; }
+  .np { background: none; border: none; border-radius: 32px; padding: 8px 20px; font-size: 13px; color: #888780; cursor: pointer; transition: all .18s; font-weight: 400; font-family: inherit; }
+  .np.on { background: #F7F5FF; color: #3C3489; font-weight: 500; border: 0.5px solid #CECBF6; }
+  .np:hover:not(.on) { background: #F7F5FF; color: #534AB7; }
+  .frame { width: 320px; border-radius: 48px; border: 8px solid #1a1035; background: #1a1035; overflow: hidden; box-shadow: 0 24px 60px rgba(45,27,78,0.25), 0 8px 20px rgba(45,27,78,0.15); }
+  .notch-bar { background: #1a1035; display: flex; justify-content: center; padding: 8px 0 4px; }
+  .dyn-island { width: 90px; height: 26px; background: #000; border-radius: 13px; }
+  .s { display: none; flex-direction: column; height: 620px; }
+  .s.on { display: flex; }
+  .screen-body { flex: 1; overflow-y: auto; background: #F7F5FF; scrollbar-width: none; }
+  .screen-body::-webkit-scrollbar { display: none; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; padding: 6px 20px 0; font-size: 11px; color: #888780; background: #F7F5FF; }
+  .topbar.dark { background: #2D1B4E; color: #AFA9EC; }
+  .pill-tag { display: inline-flex; align-items: center; font-size: 10px; font-weight: 500; padding: 3px 10px; border-radius: 20px; }
+  .tag-y { background: #EEEDFE; color: #3C3489; }
+  .tag-p { background: #E1F5EE; color: #085041; }
+  .tag-c { background: #FAEEDA; color: #633806; }
+  .tag-m { background: #FBEAF0; color: #72243E; }
+  .hero { background: #2D1B4E; padding: 16px 18px 20px; }
+  .hero-eyebrow { font-size: 10px; color: #AFA9EC; letter-spacing: .07em; margin-bottom: 5px; text-transform: uppercase; }
+  .hero-title { font-size: 19px; font-weight: 500; color: #fff; line-height: 1.25; margin-bottom: 3px; }
+  .hero-sub { font-size: 11px; color: #AFA9EC; }
+  .card-white { background: #fff; border-radius: 16px; border: 0.5px solid #EEEDFE; }
+  .section-label { font-size: 10px; font-weight: 500; color: #888780; letter-spacing: .07em; text-transform: uppercase; padding: 14px 16px 6px; background: #F7F5FF; }
+  .btn-primary { background: #3C3489; color: #EEEDFE; border: none; border-radius: 22px; padding: 8px 18px; font-size: 12px; font-weight: 500; cursor: pointer; transition: transform .1s, background .15s; font-family: inherit; }
+  .btn-primary:hover { background: #534AB7; }
+  .btn-primary:active { transform: scale(.96); background: #26215C; }
+  .btn-ghost { background: none; border: 0.5px solid #AFA9EC; color: #3C3489; border-radius: 22px; padding: 7px 16px; font-size: 12px; cursor: pointer; transition: all .15s; font-family: inherit; }
+  .btn-ghost:hover { background: #EEEDFE; }
+  .chip { display: inline-block; padding: 4px 11px; border-radius: 20px; font-size: 10px; font-weight: 500; }
+  .chip-ok { background: #E1F5EE; color: #085041; }
+  .chip-wait { background: #FAEEDA; color: #633806; }
+  .chip-full { background: #FCEBEB; color: #791F1F; }
+  .divider { height: 0.5px; background: #EEEDFE; margin: 0 16px; }
+  .tab-bar { background: #fff; border-top: 0.5px solid #EEEDFE; display: flex; flex-shrink: 0; }
+  .ti-tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 9px 0 11px; font-size: 9px; color: #B4B2A9; cursor: pointer; border: none; background: none; transition: color .15s; font-family: inherit; }
+  .ti-tab i { font-size: 22px; }
+  .ti-tab.on { color: #3C3489; }
+  .menu-row { display: flex; align-items: center; gap: 12px; padding: 13px 14px; cursor: pointer; transition: background .15s; }
+  .menu-row:hover { background: #F7F5FF; }
+  .day-pill { flex: 1; border-radius: 10px; padding: 7px 0; text-align: center; cursor: pointer; transition: background .15s; border: none; font-family: inherit; }
+  .toggle-switch { width: 38px; height: 22px; background: #D3D1C7; border-radius: 11px; position: relative; cursor: pointer; transition: background .2s; flex-shrink: 0; }
+  .toggle-switch.on { background: #3C3489; }
+  .toggle-knob { width: 18px; height: 18px; background: #fff; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: left .2s; }
+  .toggle-switch.on .toggle-knob { left: 18px; }
+  .toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); background: #26215C; color: #EEEDFE; font-size: 12px; padding: 10px 20px; border-radius: 24px; white-space: nowrap; opacity: 0; transition: opacity .25s; pointer-events: none; z-index: 100; box-shadow: 0 4px 16px rgba(45,27,78,0.3); }
+  .toast.show { opacity: 1; }
+  .course-card-btn { min-width: 128px; padding: 12px; cursor: pointer; transition: transform .15s, border-color .15s; }
+  .course-card-btn:hover { transform: translateY(-2px); border-color: #AFA9EC; }
+</style>
+</head>
+<body>
+
+<div style="text-align:center">
+  <h1>ZenWell</h1>
+  <p class="subtitle">Aperçu application mobile · Prototype interactif</p>
+</div>
+
+<div class="nav-pills">
+  <button class="np on" onclick="go('home',this)">Accueil</button>
+  <button class="np" onclick="go('plan',this)">Planning</button>
+  <button class="np" onclick="go('my',this)">Mes cours</button>
+  <button class="np" onclick="go('profil',this)">Profil</button>
+</div>
+
+<div class="frame">
+  <div class="notch-bar"><div class="dyn-island"></div></div>
+
+  <!-- HOME -->
+  <div class="s on" id="s-home">
+    <div class="screen-body">
+      <div class="topbar">9:41<span>●●●● 98%</span></div>
+      <div class="hero">
+        <div class="hero-eyebrow">Bonjour, Luna</div>
+        <div class="hero-title">Votre espace bien-être</div>
+        <div class="hero-sub">Marne-la-Vallée · Studio ZenWell</div>
+        <div style="margin-top:14px;background:rgba(255,255,255,0.1);border-radius:14px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:10px;color:#AFA9EC;margin-bottom:3px">Prochain cours</div>
+            <div style="font-size:14px;font-weight:500;color:#fff">Pilates Flow</div>
+            <div style="font-size:11px;color:#AFA9EC;margin-top:2px">Aujourd'hui · 18h30 · Studio A</div>
+          </div>
+          <button class="btn-primary" style="font-size:11px;padding:7px 14px" onclick="reserveCourse('Pilates Flow','18h30','11','Marie')">Rejoindre</button>
+        </div>
+      </div>
+      <div class="section-label">Ma progression</div>
+      <div style="display:flex;gap:8px;padding:0 16px 4px">
+        <div class="card-white" style="flex:1;padding:12px 10px;text-align:center">
+          <div style="font-size:20px;font-weight:500;color:#3C3489" id="stat-cours">8</div>
+          <div style="font-size:10px;color:#888780;margin-top:2px">Cours ce mois</div>
+        </div>
+        <div class="card-white" style="flex:1;padding:12px 10px;text-align:center">
+          <div style="font-size:20px;font-weight:500;color:#3C3489">4h</div>
+          <div style="font-size:10px;color:#888780;margin-top:2px">Temps actif</div>
+        </div>
+        <div class="card-white" style="flex:1;padding:12px 10px;text-align:center">
+          <div style="font-size:20px;font-weight:500;color:#3C3489">3</div>
+          <div style="font-size:10px;color:#888780;margin-top:2px">Sem. conséc.</div>
+        </div>
+      </div>
+      <div class="section-label">Recommandés</div>
+      <div style="display:flex;gap:10px;padding:0 16px 20px;overflow-x:auto">
+        <div class="card-white course-card-btn" onclick="openCourse('Slow Yoga')">
+          <span class="pill-tag tag-y">Yoga</span>
+          <div style="font-size:13px;font-weight:500;color:#26215C;margin:7px 0 3px">Slow Yoga</div>
+          <div style="font-size:10px;color:#888780">Lun · 12h00 · 60 min</div>
+          <div style="font-size:10px;color:#888780;margin-top:1px">Marie · Studio B</div>
+        </div>
+        <div class="card-white course-card-btn" onclick="openCourse('Pilates Flow')">
+          <span class="pill-tag tag-p">Pilates</span>
+          <div style="font-size:13px;font-weight:500;color:#26215C;margin:7px 0 3px">Pilates Flow</div>
+          <div style="font-size:10px;color:#888780">Mar · 18h30 · 45 min</div>
+          <div style="font-size:10px;color:#888780;margin-top:1px">Marie · Studio A</div>
+        </div>
+        <div class="card-white course-card-btn" onclick="openCourse('Méditation')">
+          <span class="pill-tag tag-m">Méditation</span>
+          <div style="font-size:13px;font-weight:500;color:#26215C;margin:7px 0 3px">Pleine conscience</div>
+          <div style="font-size:10px;color:#888780">Mer · 07h30 · 30 min</div>
+          <div style="font-size:10px;color:#888780;margin-top:1px">Thomas · Salle Zen</div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-bar">
+      <button class="ti-tab on" onclick="go('home',null)"><i class="ti ti-home"></i>Accueil</button>
+      <button class="ti-tab" onclick="go('plan',null)"><i class="ti ti-calendar"></i>Planning</button>
+      <button class="ti-tab" onclick="go('my',null)"><i class="ti ti-bookmark"></i>Mes cours</button>
+      <button class="ti-tab" onclick="go('profil',null)"><i class="ti ti-user"></i>Profil</button>
+    </div>
+  </div>
+
+  <!-- PLANNING -->
+  <div class="s" id="s-plan">
+    <div class="screen-body">
+      <div class="topbar dark">9:41<span>●●●● 98%</span></div>
+      <div class="hero" style="padding-top:10px">
+        <div class="hero-eyebrow">Semaine du 10 juin</div>
+        <div class="hero-title">Planning des cours</div>
+        <div style="display:flex;gap:6px;margin-top:12px">
+          <button class="day-pill" style="background:rgba(255,255,255,0.12)" onclick="pickDay(this,'LUN')"><div style="font-size:9px;color:#AFA9EC">LUN</div><div style="font-size:14px;font-weight:500;color:#fff">10</div></button>
+          <button class="day-pill" style="background:#534AB7" onclick="pickDay(this,'MAR')"><div style="font-size:9px;color:#CECBF6">MAR</div><div style="font-size:14px;font-weight:500;color:#fff">11</div></button>
+          <button class="day-pill" style="background:rgba(255,255,255,0.12)" onclick="pickDay(this,'MER')"><div style="font-size:9px;color:#AFA9EC">MER</div><div style="font-size:14px;font-weight:500;color:#fff">12</div></button>
+          <button class="day-pill" style="background:rgba(255,255,255,0.12)" onclick="pickDay(this,'JEU')"><div style="font-size:9px;color:#AFA9EC">JEU</div><div style="font-size:14px;font-weight:500;color:#fff">13</div></button>
+          <button class="day-pill" style="background:rgba(255,255,255,0.12)" onclick="pickDay(this,'VEN')"><div style="font-size:9px;color:#AFA9EC">VEN</div><div style="font-size:14px;font-weight:500;color:#fff">14</div></button>
+        </div>
+      </div>
+      <div style="padding:12px 16px 20px;background:#F7F5FF" id="plan-content"></div>
+    </div>
+    <div class="tab-bar">
+      <button class="ti-tab" onclick="go('home',null)"><i class="ti ti-home"></i>Accueil</button>
+      <button class="ti-tab on" onclick="go('plan',null)"><i class="ti ti-calendar"></i>Planning</button>
+      <button class="ti-tab" onclick="go('my',null)"><i class="ti ti-bookmark"></i>Mes cours</button>
+      <button class="ti-tab" onclick="go('profil',null)"><i class="ti ti-user"></i>Profil</button>
+    </div>
+  </div>
+
+  <!-- MES COURS -->
+  <div class="s" id="s-my">
+    <div class="screen-body">
+      <div class="topbar dark">9:41<span>●●●● 98%</span></div>
+      <div class="hero" style="padding-top:10px">
+        <div class="hero-eyebrow">Juin 2025</div>
+        <div class="hero-title" id="my-title">2 réservations</div>
+      </div>
+      <div style="display:flex;border-bottom:0.5px solid #EEEDFE;background:#fff">
+        <button onclick="tab3('a')" id="t3a" style="flex:1;padding:10px 0;border:none;border-bottom:2px solid #3C3489;background:none;font-size:12px;font-weight:500;color:#3C3489;cursor:pointer;font-family:inherit">À venir</button>
+        <button onclick="tab3('b')" id="t3b" style="flex:1;padding:10px 0;border:none;border-bottom:2px solid transparent;background:none;font-size:12px;color:#888780;cursor:pointer;font-family:inherit">Passés</button>
+        <button onclick="tab3('c')" id="t3c" style="flex:1;padding:10px 0;border:none;border-bottom:2px solid transparent;background:none;font-size:12px;color:#888780;cursor:pointer;font-family:inherit">Annulés</button>
+      </div>
+      <div id="t3a-c" style="padding:12px 16px;background:#F7F5FF">
+        <div id="booked-courses"></div>
+        <div id="default-bookings">
+          <div class="card-white" style="display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:8px">
+            <div style="background:#3C3489;border-radius:12px;width:42px;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
+              <div style="font-size:16px;font-weight:500;color:#fff;line-height:1">10</div>
+              <div style="font-size:9px;color:#CECBF6">LUN</div>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:500;color:#26215C">Slow Yoga</div>
+              <div style="font-size:11px;color:#888780;margin-top:2px">12h00 · Marie · Studio B</div>
+            </div>
+            <span class="chip chip-ok">Confirmé</span>
+          </div>
+          <div class="card-white" style="display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:8px">
+            <div style="background:#534AB7;border-radius:12px;width:42px;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
+              <div style="font-size:16px;font-weight:500;color:#fff;line-height:1">13</div>
+              <div style="font-size:9px;color:#CECBF6">JEU</div>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:500;color:#26215C">HIIT Express</div>
+              <div style="font-size:11px;color:#888780;margin-top:2px">07h00 · Kevin · Studio A</div>
+            </div>
+            <span class="chip chip-ok">Confirmé</span>
+          </div>
+        </div>
+        <div style="background:#EEEDFE;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px">
+          <i class="ti ti-bell" style="font-size:20px;color:#534AB7;flex-shrink:0"></i>
+          <div>
+            <div style="font-size:12px;font-weight:500;color:#26215C">Rappels activés</div>
+            <div style="font-size:11px;color:#534AB7;margin-top:1px">Notification 2h avant chaque cours</div>
+          </div>
+        </div>
+      </div>
+      <div id="t3b-c" style="display:none;padding:12px 16px;background:#F7F5FF">
+        <div class="card-white" style="display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:8px;opacity:.7">
+          <div style="background:#888780;border-radius:12px;width:42px;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
+            <div style="font-size:16px;font-weight:500;color:#fff;line-height:1">03</div>
+            <div style="font-size:9px;color:#D3D1C7">LUN</div>
+          </div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:500;color:#26215C">Slow Yoga</div>
+            <div style="font-size:11px;color:#888780;margin-top:2px">12h00 · Marie · Studio B</div>
+          </div>
+          <span class="chip" style="background:#F1EFE8;color:#5F5E5A">Terminé</span>
+        </div>
+        <div class="card-white" style="display:flex;align-items:center;gap:12px;padding:12px 14px;opacity:.7">
+          <div style="background:#888780;border-radius:12px;width:42px;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
+            <div style="font-size:16px;font-weight:500;color:#fff;line-height:1">06</div>
+            <div style="font-size:9px;color:#D3D1C7">JEU</div>
+          </div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:500;color:#26215C">Méditation</div>
+            <div style="font-size:11px;color:#888780;margin-top:2px">07h30 · Thomas · Salle Zen</div>
+          </div>
+          <span class="chip" style="background:#F1EFE8;color:#5F5E5A">Terminé</span>
+        </div>
+      </div>
+      <div id="t3c-c" style="display:none;padding:30px 16px;text-align:center;color:#888780;font-size:13px;background:#F7F5FF">
+        Aucune annulation ce mois
+      </div>
+    </div>
+    <div class="tab-bar">
+      <button class="ti-tab" onclick="go('home',null)"><i class="ti ti-home"></i>Accueil</button>
+      <button class="ti-tab" onclick="go('plan',null)"><i class="ti ti-calendar"></i>Planning</button>
+      <button class="ti-tab on" onclick="go('my',null)"><i class="ti ti-bookmark"></i>Mes cours</button>
+      <button class="ti-tab" onclick="go('profil',null)"><i class="ti ti-user"></i>Profil</button>
+    </div>
+  </div>
+
+  <!-- PROFIL -->
+  <div class="s" id="s-profil">
+    <div class="screen-body">
+      <div class="topbar dark">9:41<span>●●●● 98%</span></div>
+      <div style="background:#2D1B4E;padding:20px 16px 24px;display:flex;flex-direction:column;align-items:center">
+        <div style="width:64px;height:64px;border-radius:50%;background:#534AB7;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:500;color:#fff;border:2px solid #AFA9EC;margin-bottom:10px">LV</div>
+        <div style="font-size:16px;font-weight:500;color:#fff;margin-bottom:3px">Luna V.</div>
+        <div style="font-size:11px;color:#AFA9EC;margin-bottom:10px">Membre depuis juin 2025</div>
+        <div style="background:#534AB7;border-radius:20px;padding:5px 14px;font-size:11px;color:#CECBF6">Essai Premium · 14 jours restants</div>
+        <div style="display:flex;gap:24px;margin-top:16px">
+          <div style="text-align:center"><div style="font-size:18px;font-weight:500;color:#fff" id="profil-cours">8</div><div style="font-size:10px;color:#AFA9EC;margin-top:1px">Cours</div></div>
+          <div style="width:0.5px;background:#534AB7"></div>
+          <div style="text-align:center"><div style="font-size:18px;font-weight:500;color:#fff">4h</div><div style="font-size:10px;color:#AFA9EC;margin-top:1px">Actif</div></div>
+          <div style="width:0.5px;background:#534AB7"></div>
+          <div style="text-align:center"><div style="font-size:18px;font-weight:500;color:#fff">3</div><div style="font-size:10px;color:#AFA9EC;margin-top:1px">Semaines</div></div>
+        </div>
+      </div>
+      <div style="padding:14px 16px 20px;background:#F7F5FF">
+        <div style="font-size:10px;font-weight:500;color:#888780;letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px">Paramètres</div>
+        <div class="card-white" style="overflow:hidden">
+          <div class="menu-row">
+            <div style="width:36px;height:36px;border-radius:10px;background:#EEEDFE;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-bell" style="font-size:18px;color:#534AB7"></i></div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:500;color:#26215C">Rappels de cours</div><div style="font-size:11px;color:#888780;margin-top:1px" id="notif-label">Activés · 2h avant</div></div>
+            <div class="toggle-switch on" id="toggle-notif" onclick="toggleNotif()"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="divider"></div>
+          <div class="menu-row">
+            <div style="width:36px;height:36px;border-radius:10px;background:#EEEDFE;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-mail" style="font-size:18px;color:#534AB7"></i></div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:500;color:#26215C">Newsletter ZenWell</div><div style="font-size:11px;color:#888780;margin-top:1px" id="news-label">Activée</div></div>
+            <div class="toggle-switch on" id="toggle-news" onclick="toggleNews()"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="divider"></div>
+          <div class="menu-row" onclick="showToast('Abonnement Premium — bientôt disponible')">
+            <div style="width:36px;height:36px;border-radius:10px;background:#EEEDFE;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-credit-card" style="font-size:18px;color:#534AB7"></i></div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:500;color:#26215C">Passer en Premium</div><div style="font-size:11px;color:#888780;margin-top:1px">29€ / mois · Sans engagement</div></div>
+            <i class="ti ti-chevron-right" style="font-size:16px;color:#B4B2A9"></i>
+          </div>
+          <div class="divider"></div>
+          <div class="menu-row" onclick="showToast('Paramètres du compte')">
+            <div style="width:36px;height:36px;border-radius:10px;background:#EEEDFE;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-settings" style="font-size:18px;color:#534AB7"></i></div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:500;color:#26215C">Paramètres</div><div style="font-size:11px;color:#888780;margin-top:1px">Compte & confidentialité</div></div>
+            <i class="ti ti-chevron-right" style="font-size:16px;color:#B4B2A9"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-bar">
+      <button class="ti-tab" onclick="go('home',null)"><i class="ti ti-home"></i>Accueil</button>
+      <button class="ti-tab" onclick="go('plan',null)"><i class="ti ti-calendar"></i>Planning</button>
+      <button class="ti-tab" onclick="go('my',null)"><i class="ti ti-bookmark"></i>Mes cours</button>
+      <button class="ti-tab on" onclick="go('profil',null)"><i class="ti ti-user"></i>Profil</button>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const planData={
+  LUN:[{tag:'tag-y',label:'Yoga',name:'Slow Yoga',time:'12h00',dur:'60 min',coach:'Marie',spots:6,chip:'chip-ok',chipTxt:'6 places'},{tag:'tag-p',label:'Pilates',name:'Pilates Débutant',time:'19h00',dur:'45 min',coach:'Sophie',spots:4,chip:'chip-ok',chipTxt:'4 places'}],
+  MAR:[{tag:'tag-m',label:'Méditation',name:'Pleine conscience',time:'07h30',dur:'30 min',coach:'Thomas',spots:6,chip:'chip-ok',chipTxt:'6 places'},{tag:'tag-p',label:'Pilates',name:'Pilates Flow',time:'18h30',dur:'45 min',coach:'Marie',spots:2,chip:'chip-wait',chipTxt:'2 places'},{tag:'tag-c',label:'Cross',name:'HIIT Express',time:'19h30',dur:'30 min',coach:'Kevin',spots:0,chip:'chip-full',chipTxt:'Complet'}],
+  MER:[{tag:'tag-y',label:'Yoga',name:'Yin Yoga',time:'09h00',dur:'75 min',coach:'Marie',spots:3,chip:'chip-wait',chipTxt:'3 places'},{tag:'tag-m',label:'Méditation',name:'Respiration',time:'12h30',dur:'30 min',coach:'Thomas',spots:8,chip:'chip-ok',chipTxt:'8 places'}],
+  JEU:[{tag:'tag-c',label:'Cross',name:'HIIT Express',time:'07h00',dur:'30 min',coach:'Kevin',spots:5,chip:'chip-ok',chipTxt:'5 places'},{tag:'tag-p',label:'Pilates',name:'Pilates Avancé',time:'18h00',dur:'50 min',coach:'Sophie',spots:1,chip:'chip-wait',chipTxt:'1 place'}],
+  VEN:[{tag:'tag-y',label:'Yoga',name:'Slow Yoga',time:'12h00',dur:'60 min',coach:'Marie',spots:7,chip:'chip-ok',chipTxt:'7 places'},{tag:'tag-m',label:'Méditation',name:'Yoga Nidra',time:'17h00',dur:'45 min',coach:'Thomas',spots:0,chip:'chip-full',chipTxt:'Complet'}]
+};
+const dayNames={LUN:'Lundi 10 juin',MAR:'Mardi 11 juin',MER:'Mercredi 12 juin',JEU:'Jeudi 13 juin',VEN:'Vendredi 14 juin'};
+const dayNums={LUN:'10',MAR:'11',MER:'12',JEU:'13',VEN:'14'};
+let currentDay='MAR';
+const booked=new Set();
+let baseCount=8;
+let toastTimer=null;
+
+function renderPlan(day){
+  const courses=planData[day]||[];
+  let html='<div style="font-size:10px;font-weight:500;color:#888780;letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px">'+dayNames[day]+'</div>';
+  courses.forEach(c=>{
+    const isB=booked.has(c.name);
+    const disabled=c.spots===0&&!isB;
+    html+=`<div class="card-white" style="padding:12px 14px;margin-bottom:8px${disabled?';opacity:.6':''}">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <span class="pill-tag ${c.tag}">${c.label}</span>
+        <span class="chip ${isB?'chip-ok':c.chip}">${isB?'Réservé':c.chipTxt}</span>
+      </div>
+      <div style="font-size:14px;font-weight:500;color:#26215C;margin-bottom:2px">${c.name}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
+        <div style="font-size:11px;color:#888780">${c.time} · ${c.dur} · ${c.coach}</div>
+        ${isB?`<button class="btn-ghost" style="font-size:10px;padding:5px 12px" onclick="cancelCourse('${c.name}')">Annuler</button>`:disabled?`<button class="btn-ghost" style="font-size:10px;padding:5px 12px" onclick="showToast('Ajouté à la liste d\\'attente')">Liste att.</button>`:`<button class="btn-primary" style="font-size:10px;padding:5px 12px" onclick="reserveCourse('${c.name}','${c.time}','${dayNums[currentDay]}','${c.coach}')">Réserver</button>`}
+      </div>
+    </div>`;
+  });
+  document.getElementById('plan-content').innerHTML=html;
+}
+
+function reserveCourse(name,time,dayNum,coach){
+  if(booked.has(name)){showToast('Déjà réservé !');return;}
+  booked.add(name);baseCount++;
+  document.getElementById('stat-cours').textContent=baseCount;
+  document.getElementById('profil-cours').textContent=baseCount;
+  showToast('Réservé : '+name+' à '+time);
+  renderPlan(currentDay);updateMyBookings(name,time,dayNum,coach);
+  document.getElementById('my-title').textContent=(2+booked.size)+' réservations';
+}
+
+function cancelCourse(name){
+  booked.delete(name);baseCount=Math.max(8,baseCount-1);
+  document.getElementById('stat-cours').textContent=baseCount;
+  document.getElementById('profil-cours').textContent=baseCount;
+  showToast('Réservation annulée');renderPlan(currentDay);
+  const el=document.getElementById('booked-'+name.replace(/[\s']/g,''));
+  if(el)el.remove();
+  const n=2+booked.size;
+  document.getElementById('my-title').textContent=n+' réservation'+(n>1?'s':'');
+}
+
+function updateMyBookings(name,time,dayNum,coach){
+  const id='booked-'+name.replace(/[\s']/g,'');
+  if(document.getElementById(id))return;
+  const div=document.createElement('div');
+  div.id=id;div.className='card-white';
+  div.style.cssText='display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:8px';
+  div.innerHTML=`<div style="background:#8E5FC9;border-radius:12px;width:42px;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0"><div style="font-size:16px;font-weight:500;color:#fff;line-height:1">${dayNum}</div><div style="font-size:9px;color:#EEEDFE">${currentDay}</div></div><div style="flex:1"><div style="font-size:13px;font-weight:500;color:#26215C">${name}</div><div style="font-size:11px;color:#888780;margin-top:2px">${time} · ${coach}</div></div><span class="chip chip-ok">Confirmé</span>`;
+  document.getElementById('booked-courses').prepend(div);
+}
+
+function openCourse(name){
+  go('plan',null);
+  document.querySelectorAll('.np').forEach((b,i)=>b.classList.toggle('on',i===1));
+  showToast('Cours : '+name);
+}
+
+function pickDay(btn,day){
+  currentDay=day;
+  document.querySelectorAll('.day-pill').forEach(b=>{b.style.background='rgba(255,255,255,0.12)';b.querySelectorAll('div')[0].style.color='#AFA9EC';});
+  btn.style.background='#534AB7';btn.querySelectorAll('div')[0].style.color='#CECBF6';
+  renderPlan(day);
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  if(toastTimer)clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+let notifOn=true;
+function toggleNotif(){
+  notifOn=!notifOn;
+  document.getElementById('toggle-notif').classList.toggle('on',notifOn);
+  document.getElementById('notif-label').textContent=notifOn?'Activés · 2h avant':'Désactivés';
+  showToast(notifOn?'Rappels activés':'Rappels désactivés');
+}
+let newsOn=true;
+function toggleNews(){
+  newsOn=!newsOn;
+  document.getElementById('toggle-news').classList.toggle('on',newsOn);
+  document.getElementById('news-label').textContent=newsOn?'Activée':'Désactivée';
+  showToast(newsOn?'Newsletter activée':'Newsletter désactivée');
+}
+
+const screens={home:'s-home',plan:'s-plan',my:'s-my',profil:'s-profil'};
+function go(name,btn){
+  Object.values(screens).forEach(id=>{const el=document.getElementById(id);el.classList.remove('on');el.style.display='none';});
+  const target=document.getElementById(screens[name]);target.style.display='flex';
+  setTimeout(()=>target.classList.add('on'),10);
+  document.querySelectorAll('.np').forEach((b,i)=>b.classList.toggle('on',['home','plan','my','profil'][i]===name));
+  document.querySelectorAll('#'+screens[name]+' .ti-tab').forEach((t,i)=>t.classList.toggle('on',['home','plan','my','profil'].indexOf(name)===i));
+}
+
+function tab3(k){
+  ['a','b','c'].forEach(x=>{
+    const c=document.getElementById('t3'+x+'-c');if(c)c.style.display=x===k?'block':'none';
+    const b=document.getElementById('t3'+x);
+    if(b){b.style.borderBottomColor=x===k?'#3C3489':'transparent';b.style.color=x===k?'#3C3489':'#888780';b.style.fontWeight=x===k?'500':'400';}
+  });
+}
+
+renderPlan('MAR');
+</script>
+</body>
+</html>
